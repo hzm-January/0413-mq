@@ -1,0 +1,7 @@
+dependencies {
+    // https://mvnrepository.com/artifact/org.apache.rocketmq/rocketmq-client
+    compile vc.junit
+    compile vc.rocketmq
+//    compile group: 'org.apache.rocketmq', name: 'rocketmq-client', version: '4.3.2'
+
+}

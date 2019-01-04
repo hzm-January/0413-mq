@@ -1,0 +1,54 @@
+ext {
+    junitVersion = "4.12"
+    rocketMqVersion = "4.3.2"
+    vc = [
+            junit   : "junit:junit:$junitVersion",
+            rocketmq: "org.apache.rocketmq:rocketmq-client:$rocketMqVersion"
+    ]
+}
+
+configure(allprojects) {
+    group 'houzm.accumulation.mq'
+    version version
+    apply plugin: 'java'
+    compileJava {
+        sourceCompatibility = 1.8
+        targetCompatibility = 1.8
+        options.encoding = "UTF-8"
+    }
+    compileTestJava {
+        sourceCompatibility = 1.8
+        targetCompatibility = 1.8
+        options.encoding = "UTF-8"
+    }
+
+    repositories {
+        mavenLocal();
+        jcenter();
+        mavenCentral();
+    }
+    configurations.all {
+        // Check for updates every build
+        resolutionStrategy.cacheChangingModulesFor 0, "seconds"
+    }
+
+    dependencies {
+        testCompile(vc.junit) {
+            //添加其他配置项
+        }
+    }
+}
+
+/**
+ * 配置子项目
+ */
+configure(subprojects) {
+
+}
+
+/***
+ * 配置根项目
+ */
+configure(rootProject) {
+    description = "mq accumulation"
+}
