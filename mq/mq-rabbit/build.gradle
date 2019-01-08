@@ -1,0 +1,5 @@
+dependencies {
+    compile vc.rabbitmq
+    // https://mvnrepository.com/artifact/org.slf4j/slf4j-nop
+    compile group: 'org.slf4j', name: 'slf4j-nop', version: '1.7.25'
+}
