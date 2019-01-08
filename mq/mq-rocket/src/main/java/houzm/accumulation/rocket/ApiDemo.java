@@ -16,9 +16,9 @@ public class ApiDemo {
     public static void main(String[] args) throws Exception {
 
         //同步消息发送
-//        syncProducer();
+        syncProducer();
         //异步消息发送
-        asyncProducer();
+//        asyncProducer();
     }
 
 

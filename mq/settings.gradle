@@ -1,3 +1,4 @@
 rootProject.name = 'mq'
 include 'mq-rocket'
+include 'mq-rabbit'
 
