@@ -1,9 +1,9 @@
 # RabbitMQ 学习笔记
-## hello world
-### 1. 生产者
-### 2. 消费者
-## work queues
-### 1. 多消费者消费任务
+## 1 hello world
+### 1.1 生产者
+### 1.2 消费者
+## 2 work queues
+### 2.1 多消费者消费任务
 官方说明：
 >By default, RabbitMQ will send each message to the next consumer, in sequence. 
 On average every consumer will get the same number of messages.
@@ -12,8 +12,8 @@ This way of distributing messages is called round-robin.
 默认情况下，RabbitMQ按照顺序将消息发送给每个消费者，
 每个消费者会获取到相同数目的消息，
 这种分发消息的方式被称为round-robin循环调度
-### 2. Consumer Acknowledgements（消费者确认）
-#### 2.1 为什么需要Consumer Acknowledgements
+### 2.2 Consumer Acknowledgements（消费者确认）
+#### 2.2.1 为什么需要Consumer Acknowledgements
 官方说明：
 >Systems that use a messaging broker such as RabbitMQ are by definition distributed. 
 Since protocol methods (messages) sent are not guaranteed to reach the peer or be successfully processed by it, 
@@ -25,7 +25,7 @@ but the idea is largely the same in other protocols (STOMP, MQTT, et cetera).
 诸如RabbitMQ这种分布式消息队列，由于发送的方法或者消息不能确保接受者接收到并且已处理完成，
 所以发布者和消费者都需要一个交付和处理确认机制
 
-#### 2.2 什么是Consumer Acknowledgements
+#### 2.2.2 什么是Consumer Acknowledgements
 > Doing a task can take a few seconds.
 You may wonder what happens if one of the consumers starts a long task and dies with it only partly done. 
 With our current code, once RabbitMQ delivers a message to the customer it immediately marks it for deletion. 
@@ -53,9 +53,9 @@ That way you can be sure that no message is lost, even if the workers occasional
 如果消费者宕机（可能情况：channel关闭，连接关闭，TCP连接丢失）没有发送ack回执，RabbitMQ了解到该消息没有被完全执行，将会重新排队。
 如果此时还有其他consumer在线，将会快速的将该消息发送给其他consumer。这种方式将会确保消息不会丢失。
 
-#### 2.3 如何使用Consumer Acknowledgements（消费者确认）
+#### 2.2.3 如何使用Consumer Acknowledgements（消费者确认）
 autoAck设置为false，并主动调用支付确认Channel#basicAck和Channel#basicNack
-#####2.3.2 Positively Acknowledging Deliveries 主动积极的交付确认
+#####2.2.3.2 Positively Acknowledging Deliveries 主动积极的交付确认
 >官方说明
 
 >API methods used for delivery acknowledgement are usually exposed as operations on a channel in client libraries. 
