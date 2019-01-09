@@ -54,6 +54,7 @@ That way you can be sure that no message is lost, even if the workers occasional
 如果此时还有其他consumer在线，将会快速的将该消息发送给其他consumer。这种方式将会确保消息不会丢失。
 
 #### 2.2.3 如何使用Consumer Acknowledgements（消费者确认）
+
 ##### 2.2.3.1 自动交付确认
 autoAck=true
 
@@ -83,14 +84,15 @@ Some client libraries will apply TCP back pressure
 (stop reading from the socket until the backlog of unprocessed deliveries drops beyond a certain limit). 
 Automatic acknolwedgement mode is therefore only recommended for consumers that can process deliveries efficiently and at a steady rate.
 
-自动确认需要考虑的另外一种情况是消息过载，使用自动确认模式时需要考虑的另一件事是消费者过载。
+自动确认需要考虑的另外一种情况是消息过载。
 手动确认模式通常与有界信道预取一起使用，该预取(prefetchCount)限制了信道上未完成（“进行中”）交付的数量。
 但是，通过自动确认，根据定义没有这种限制。因此，消费者可能会被交付速度所淹没，
 可能会积累内存中的积压并耗尽堆或使操作系统终止其进程。
 某些客户端库将应用TCP反压（停止从套接字读取，直到未处理的交付积压超过某个限制）。
 因此，仅建议能够以稳定的速度有效处理交付的消费者使用自动交钥匙模式。
 
-#####2.2.3.2 Positively Acknowledging Deliveries 主动积极的交付确认
+##### 2.2.3.2 Positively Acknowledging Deliveries 主动积极的交付确认
+
 autoAck设置为false，并主动调用支付确认Channel#basicAck和Channel#basicNack
 
 >官方说明
