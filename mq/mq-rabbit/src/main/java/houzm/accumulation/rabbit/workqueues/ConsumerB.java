@@ -13,7 +13,9 @@ import com.rabbitmq.client.Delivery;
  * author: hzm_dream@163.com
  * date: 2019/1/9 13:39
  * description:
- * 消息消费者
+ * 消息消费者B
+ * Acknowledging Multiple Deliveries at Once （一次确认多个投递）
+ *
  */
 public class ConsumerB {
     private static final String QUEUE_NAME = "hello";
@@ -39,10 +41,12 @@ public class ConsumerB {
                     e.printStackTrace();
                 } finally {
                     System.out.println(" [x] Done");
+                    channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
                 }
             }
         };
-        boolean autoAck = true;
+//        boolean autoAck = true; //自动确认
+        boolean autoAck = false; //手动确认
         channel.basicConsume(QUEUE_NAME, autoAck, deliverCallback, consumerTag -> {
         });
     }

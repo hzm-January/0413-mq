@@ -43,7 +43,8 @@ public class ConsumerA {
                 }
             }
         };
-        boolean autoAck = true;
+//        boolean autoAck = true; //自动确认
+        boolean autoAck = false; //手动确认
         channel.basicConsume(QUEUE_NAME, autoAck, deliverCallback, consumerTag -> {
         });
 
