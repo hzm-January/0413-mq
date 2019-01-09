@@ -1,4 +1,4 @@
-package houzm.accumulation.rabbit;
+package houzm.accumulation.rabbit.helloworld;
 
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
@@ -28,10 +28,7 @@ public class ApiDemo {
     private static final String QUEUE_NAME = "hello";
 
     public static void main(String[] args) throws Exception {
-        // producer
-//        producer();
-
-        //创建链接工厂
+//        Producer();
 //        consumer();
     }
 
