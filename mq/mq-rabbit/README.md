@@ -1,26 +1,26 @@
 # RabbitMQ 学习笔记(基于AMQP0-9-1协议)
-## hello world
-### 生产者
-### 队列
-### 消费者
-## work queues
-### 多消费者消费任务
+# hello world
+## 生产者
+## 队列
+## 消费者
+# work queues
+## 多消费者消费任务
 默认情况下，RabbitMQ按照顺序将消息发送给每个消费者，
 每个消费者会获取到相同数目的消息，
 这种分发消息的方式被称为round-robin循环调度
-### Consumer Acknowledgements（消费者确认）
-#### 为什么需要Consumer Acknowledgements
+## Consumer Acknowledgements（消费者确认）
+### 为什么需要Consumer Acknowledgements
 
 诸如RabbitMQ这种分布式消息队列，由于发送的方法或者消息不能确保接受者接收到并且已处理完成，
 所以发布者和消费者都需要一个交付和处理确认机制
 
-#### 什么是Consumer Acknowledgements  
+### 什么是Consumer Acknowledgements  
 为了确保消息不丢失，RabbitMQ支持消息确认。当consumer收到消息并且已执行完成，consumer发回ack(nowledgement)通知RabbitMQ可以自由的删除该消息  
-##### 自动消息确认  
+#### 自动消息确认  
 在自动确认模式中，消息在发送后立即被认为成功传送。
-###### 启用方式
+##### 启用方式
 autoAck设置为true（意为：fire-and-forget即发既忘，自动消息确认）  
-###### 自动消息确认缺点
+##### 自动消息确认缺点
 1. 如果将RabbitMQ将消息发送给消费者之后立即标记为删除，
 执行某个任务可能需要耗费一定的时间，如果该任务只执行了一部分，worker宕机，将丢失这个正在执行的任务，
 并且将丢失RabbitMQ已经分配给consumer的所有任务（尽管这些任务还没来得急执行，还在该consumer排队待执行），
@@ -31,17 +31,17 @@ autoAck设置为true（意为：fire-and-forget即发既忘，自动消息确认
 可能会积累内存中的积压并耗尽堆或使操作系统终止其进程。
 某些客户端库将应用TCP反压（停止从套接字读取，直到未处理的交付积压超过某个限制）。
 因此，仅建议能够以稳定的速度有效处理交付的消费者使用自动交钥匙模式。
-###### 适用场景：
+##### 适用场景：
 该模式折衷了更高的吞吐量（只要消费者可以跟上），
 以降低交付和消费者处理的安全性。这种模式通常被称为“即发即忘”。
 与手动确认模型不同，如果消费者的TCP连接或通道在成功交付之前关闭，
 则服务器发送的消息将丢失，如果系统允许这种丢失，追求高吞吐量的时候可以使用
-##### 手动消息确认：
+#### 手动消息确认：
 关闭自动消息确认，进行手动消息确认方法的调用，通知Rabbit消息接收和处理情况
-###### 优点
+##### 优点
 如果消费者宕机（可能情况：channel关闭，连接关闭，TCP连接丢失）没有发送ack回执，RabbitMQ了解到该消息没有被完全执行，将会重新排队。
 如果此时还有其他consumer在线，将会快速的将该消息发送给其他consumer。这种方式将会确保消息不会丢失。 
-###### 单次单个消息确认--启用方式
+##### 单次单个消息确认--启用方式
 1. autoAck = false
 2. 获取delivery tags
 3. 调用channel.basicAck或者channel.basicNack或者channel.basicReject通知RabbitMQ消息接收情况
@@ -53,14 +53,26 @@ autoAck设置为true（意为：fire-and-forget即发既忘，自动消息确认
 因为交付标签作用于每个channel，交付必须在被接收的channel中确认，
 如果确认交付发生在其他channel中将抛出“未知投递标签”的错误，并且会关闭channel
 
-###### 几种确认的区别
+##### 几种确认的区别
 basic.ack用于肯定确认  
 basic.nack用于否定确认（注意：这是AMQP 0-9-1的RabbitMQ扩展）  
 basic.reject用于否定确认，但与basic.nack相比有一个限制  
 basic.ack 意为通知RabbitMQ记录该消息已投递成功可以被遗弃，basic.reject有同样的效果，不同的地方在语义上：
-该消息应该被RabbitMQ标记为删除，即使该消息没有被成功处理
+该消息没有被成功处理，但是应该被RabbitMQ标记为删除
 
-###### 单次多个消息确认--启用方式
+##### 单次多个消息确认--启用方式
 设置multiple属性为true，basic.reject没有该属性（这是为什么basic.nack由RabbitMQ作为协议扩展引入的原因），可以对手动确认进行批处理以减少网络流量
 
 
+##### 消极确认和重新排队
+#问题：rabbitmq 设置requeue为true，如果队列被多个consumer绑定，并且多个队列都使用nack或者reject通知RabbitMQ消息没有被处理需要重新投递，那么队列中需要requeue的消息怎么存放的
+**描述**：如果consumer无法处理消息，但是其他consumer可能可以进行处理，就需要对消息requeue（重新排队）让其他consumer对该消息进行处理。
+当消息被重新排队时，broker会使用指定的delivery tag在其原来的位置重新排队，
+但是如果多个consumer共享queue同时传递和确认（官方文档这里没看懂），那么该消息重排队的位置将更靠近队头。  
+(due to concurrent deliveries and acknowledgements from other consumers when multiple consumers share a queue)  
+**相关方法**：basic.nack 和 basic.reject  
+**相关属性**：requeue （true重新排队，false不重新排队）；multiple（一次进行多条消息的拒绝或者重新排队）  
+> 注：重新排队的消息可以立即准备好重新发送，具体取决于它们在队列中的位置，
+即具有活动消费者的通道使用的预取值。这意味着如果所有消费者因为因瞬态而无法处理交付而重新排队，他们将创建一个重新排队/重新发送循环。
+就网络带宽和CPU资源而言，这种环路可能是昂贵的。消费者实施可以跟踪重新发送的数量并拒绝好消息（丢弃它们）或在延迟后安排重新排队。
+##### 消息预取设置(QoS)

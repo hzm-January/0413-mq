@@ -1,4 +1,4 @@
-package houzm.accumulation.rabbit.workqueues;
+package houzm.accumulation.rabbit.workqueues.batchAck;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
@@ -17,7 +17,7 @@ import com.rabbitmq.client.Delivery;
  * Acknowledging Multiple Deliveries at Once （一次确认多个投递）
  *
  */
-public class ConsumerB {
+public class Consumer {
     private static final String QUEUE_NAME = "hello";
 
     public static void main(String[] args) throws IOException, TimeoutException {
@@ -41,14 +41,19 @@ public class ConsumerB {
                     e.printStackTrace();
                 } finally {
                     System.out.println(" [x] Done");
-                    channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
+                    boolean multiple = true; //批量消息确认
+                    //通知RabbitMQ，任务执行成功
+                    channel.basicAck(delivery.getEnvelope().getDeliveryTag(), multiple);
+                    //消息消极确认，任务执行未成功，通知RabbitMQ消息可以被删除，
+//                    channel.basicReject(delivery.getEnvelope().getDeliveryTag(), multiple);
+                    //通知RabbitMQ，任务执行失败
+//                    channel.basicNack(delivery.getEnvelope().getDeliveryTag(), false, multiple);
                 }
             }
         };
 //        boolean autoAck = true; //自动确认
         boolean autoAck = false; //手动确认
-        channel.basicConsume(QUEUE_NAME, autoAck, deliverCallback, consumerTag -> {
-        });
+        channel.basicConsume(QUEUE_NAME, autoAck, deliverCallback, consumerTag -> {});
     }
 
     /**

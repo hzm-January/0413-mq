@@ -1,4 +1,4 @@
-package houzm.accumulation.rabbit.workqueues;
+package houzm.accumulation.rabbit.workqueues.singleAck;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
@@ -39,7 +39,12 @@ public class ConsumerA {
                     e.printStackTrace();
                 } finally {
                     System.out.println(" [x] Done");
+                    //通知RabbitMQ，任务执行成功
                     channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
+                    //消息消极确认，任务执行未成功，通知RabbitMQ消息可以被删除，
+//                    channel.basicReject(delivery.getEnvelope().getDeliveryTag(), false);
+                    //通知RabbitMQ，任务执行失败
+//                    channel.basicNack(delivery.getEnvelope().getDeliveryTag(), false, true);
                 }
             }
         };

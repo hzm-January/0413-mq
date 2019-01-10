@@ -1,7 +1,4 @@
-package houzm.accumulation.rabbit.workqueues;
-
-import sun.management.resources.agent;
-import sun.tools.jar.resources.jar;
+package houzm.accumulation.rabbit.workqueues.batchAck;
 
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
