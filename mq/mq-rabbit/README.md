@@ -65,13 +65,15 @@ basic.ack 意为通知RabbitMQ记录该消息已投递成功可以被遗弃，ba
 
 
 ##### 消极确认和重新排队
-#问题：rabbitmq 设置requeue为true，如果队列被多个consumer绑定，并且多个队列都使用nack或者reject通知RabbitMQ消息没有被处理需要重新投递，那么队列中需要requeue的消息怎么存放的
+#问题：如果多个consumer绑定了同一个队列，并且RabbitMQ将同一个消息发给了多个consumer，多个consumer在同一时刻nack并且requeue=true，那么queue里是否会排队多个，怎么排的。官网文档里说，是根据delivery tag排的，delivery tag在channel中是唯一的。所以我觉得queue中即使有多个consumer对同一个消息requeue，那queue总重新排队的也只有一个，不知道对不对
+
 **描述**：如果consumer无法处理消息，但是其他consumer可能可以进行处理，就需要对消息requeue（重新排队）让其他consumer对该消息进行处理。
 当消息被重新排队时，broker会使用指定的delivery tag在其原来的位置重新排队，
 但是如果多个consumer共享queue同时传递和确认（官方文档这里没看懂），那么该消息重排队的位置将更靠近队头。  
 (due to concurrent deliveries and acknowledgements from other consumers when multiple consumers share a queue)  
 **相关方法**：basic.nack 和 basic.reject  
-**相关属性**：requeue （true重新排队，false不重新排队）；multiple（一次进行多条消息的拒绝或者重新排队）  
+**相关属性**：requeue （true重新排队，false不重新排队）；multiple（一次进行多条消息的拒绝或者重新排队，只有nack方法有该属性）  
+#暂时没有理解下面的内容
 > 注：重新排队的消息可以立即准备好重新发送，具体取决于它们在队列中的位置，
 即具有活动消费者的通道使用的预取值。这意味着如果所有消费者因为因瞬态而无法处理交付而重新排队，他们将创建一个重新排队/重新发送循环。
 就网络带宽和CPU资源而言，这种环路可能是昂贵的。消费者实施可以跟踪重新发送的数量并拒绝好消息（丢弃它们）或在延迟后安排重新排队。
