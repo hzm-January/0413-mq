@@ -1,5 +1,6 @@
-package houzm.accumulation.rabbit.pulishsubscribe;
+package houzm.accumulation.rabbit.pulishsubscribe.fanout;
 
+import houzm.accumulation.rabbit.common.ServerInfo;
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
 import com.rabbitmq.client.Channel;
@@ -17,9 +18,9 @@ public class Producer {
 
     public static void main(String[] args) {
         ConnectionFactory connectionFactory = new ConnectionFactory();
-        connectionFactory.setHost("47.101.152.55");
-        connectionFactory.setUsername("houzm");
-        connectionFactory.setPassword("houzm");
+        connectionFactory.setHost(ServerInfo.SERVER_HOST);
+        connectionFactory.setUsername(ServerInfo.SERVER_USERNAME);
+        connectionFactory.setPassword(ServerInfo.SERVER_PASSWORD);
         try (Connection connection = connectionFactory.newConnection();
              Channel channel = connection.createChannel();) {
             //声明exchanges

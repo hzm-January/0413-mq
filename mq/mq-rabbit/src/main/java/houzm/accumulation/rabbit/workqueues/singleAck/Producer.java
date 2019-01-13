@@ -1,5 +1,6 @@
 package houzm.accumulation.rabbit.workqueues.singleAck;
 
+import houzm.accumulation.rabbit.common.ServerInfo;
 import sun.management.resources.agent;
 import sun.tools.jar.resources.jar;
 
@@ -21,9 +22,9 @@ public class Producer {
     public static void main(String[] args) {
         //连接工厂
         ConnectionFactory connectionFactory = new ConnectionFactory();
-        connectionFactory.setHost("47.101.152.55");
-        connectionFactory.setUsername("houzm");
-        connectionFactory.setPassword("houzm");
+        connectionFactory.setHost(ServerInfo.SERVER_HOST);
+        connectionFactory.setUsername(ServerInfo.SERVER_USERNAME);
+        connectionFactory.setPassword(ServerInfo.SERVER_PASSWORD);
 
         try (Connection connection = connectionFactory.newConnection();
              Channel channel = connection.createChannel();) {

@@ -1,5 +1,6 @@
 package houzm.accumulation.rabbit.helloworld;
 
+import houzm.accumulation.rabbit.common.ServerInfo;
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
 import com.rabbitmq.client.Channel;
@@ -28,15 +29,15 @@ public class ApiDemo {
     private static final String QUEUE_NAME = "hello";
 
     public static void main(String[] args) throws Exception {
-//        Producer();
+//        RpcClient();
 //        consumer();
     }
 
     private static void consumer() throws IOException, TimeoutException {
         ConnectionFactory connectionFactory = new ConnectionFactory();
-        connectionFactory.setHost("47.101.152.55");
-        connectionFactory.setUsername("houzm");
-        connectionFactory.setPassword("houzm");
+        connectionFactory.setHost(ServerInfo.SERVER_HOST);
+        connectionFactory.setUsername(ServerInfo.SERVER_USERNAME);
+        connectionFactory.setPassword(ServerInfo.SERVER_PASSWORD);
         Connection connection = connectionFactory.newConnection();
         Channel channel = connection.createChannel();
         channel.queueDeclare(QUEUE_NAME, false, false, false, null);
@@ -55,9 +56,9 @@ public class ApiDemo {
     private static void producer() {
         //创建链接工厂
         ConnectionFactory connectionFactory = new ConnectionFactory();
-        connectionFactory.setHost("47.101.152.55");
-        connectionFactory.setUsername("houzm");
-        connectionFactory.setPassword("houzm");
+        connectionFactory.setHost(ServerInfo.SERVER_HOST);
+        connectionFactory.setUsername(ServerInfo.SERVER_USERNAME);
+        connectionFactory.setPassword(ServerInfo.SERVER_PASSWORD);
         try (Connection connection = connectionFactory.newConnection();
              Channel channel = connection.createChannel()) {
             channel.queueDeclare(QUEUE_NAME, false, false, false, null);

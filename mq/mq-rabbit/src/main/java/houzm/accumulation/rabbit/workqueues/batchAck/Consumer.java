@@ -1,5 +1,6 @@
 package houzm.accumulation.rabbit.workqueues.batchAck;
 
+import houzm.accumulation.rabbit.common.ServerInfo;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -23,9 +24,9 @@ public class Consumer {
     public static void main(String[] args) throws IOException, TimeoutException {
         //连接工厂
         ConnectionFactory connectionFactory = new ConnectionFactory();
-        connectionFactory.setHost("47.101.152.55");
-        connectionFactory.setUsername("houzm");
-        connectionFactory.setPassword("houzm");
+        connectionFactory.setHost(ServerInfo.SERVER_HOST);
+        connectionFactory.setUsername(ServerInfo.SERVER_USERNAME);
+        connectionFactory.setPassword(ServerInfo.SERVER_PASSWORD);
         //创建连接
         Connection connection = connectionFactory.newConnection();
         Channel channel = connection.createChannel();
