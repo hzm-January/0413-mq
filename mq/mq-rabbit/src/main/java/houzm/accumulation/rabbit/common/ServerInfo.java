@@ -18,7 +18,7 @@ public class ServerInfo implements AutoCloseable {
     public static final String SERVER_PASSWORD = "houzm";
     public static volatile Connection connection = null;
 
-    public static Connection connection() {
+    public static Connection connectionSingle() {
         Connection result = connection;
         if (result == null) {
             synchronized (ServerInfo.class) {
@@ -33,6 +33,18 @@ public class ServerInfo implements AutoCloseable {
                     }
                 }
             }
+        }
+        return result;
+    }
+
+    public static Connection connection() {
+        Connection result = null;
+        try {
+            result = connectionFactory().newConnection();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (TimeoutException e) {
+            e.printStackTrace();
         }
         return result;
     }

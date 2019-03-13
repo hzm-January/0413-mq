@@ -3,6 +3,7 @@ package houzm.accumulation.rabbit.rpc;
 import houzm.accumulation.rabbit.common.ServerInfo;
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
+import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
@@ -24,14 +25,24 @@ public class RpcServer {
         Connection connection = connectionFactory.newConnection();
         Channel channel = connection.createChannel();
         channel.queueDeclare(REQUEST_QUEUE_NAME, true, false, false, null);
+//        channel.queuePurge(REQUEST_QUEUE_NAME);
+        channel.basicQos(1);
         channel.basicConsume(REQUEST_QUEUE_NAME, false, (consumerTag, delivery) -> {
             String message = new String(delivery.getBody(), "UTF-8");
             int n = Integer.parseInt(message);
             System.out.println(" [.] fib(" + message + ")");
             String respMsg = "" + fib(n);
+
             // reply
-//            channel.basicPublish("", );
-        }, consumerTag -> {
+            AMQP.BasicProperties props = new AMQP.BasicProperties()
+                    .builder()
+                    .correlationId(delivery.getProperties().getCorrelationId())
+                    .build();
+            channel.basicPublish("", delivery.getProperties().getReplyTo(), props, respMsg.getBytes("UTF-8"));
+            // consumer ack
+            channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
+
+            }, consumerTag -> {
         });
     }
 
